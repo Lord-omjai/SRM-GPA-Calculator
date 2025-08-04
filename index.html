@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRM GPA Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --srm-blue: #0066b3;
+            --srm-gold: #ffd200;
+            --srm-dark: #003a6d;
+            --srm-light: #e6f2ff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--srm-light), #ffffff);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: linear-gradient(to right, var(--srm-blue), var(--srm-dark));
+            color: white;
+            border-radius: 15px 15px 0 0;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            position: relative;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 i {
+            color: var(--srm-gold);
+            margin-right: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .calculator-container {
+            flex: 3;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .instructions {
+            background: var(--srm-light);
+            border-left: 5px solid var(--srm-blue);
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .instructions h2 {
+            color: var(--srm-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 12px;
+            padding-left: 10px;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--srm-dark);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--srm-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.2);
+        }
+
+        button {
+            background: linear-gradient(to right, var(--srm-blue), var(--srm-dark));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 102, 179, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        #addCourseBtn {
+            background: linear-gradient(to right, #28a745, #218838);
+        }
+
+        #resetBtn {
+            background: linear-gradient(to right, #dc3545, #c82333);
+        }
+
+        .course-list {
+            margin-top: 30px;
+        }
+
+        .course-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .course-item:last-child {
+            border-bottom: none;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .remove-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .result-container {
+            flex: 1;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, var(--srm-blue), var(--srm-dark));
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .result-card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .gpa-value {
+            font-size: 5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--srm-gold);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .gpa-scale {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .grade-info {
+            margin-top: 25px;
+        }
+
+        .grade-info h3 {
+            color: var(--srm-dark);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background: var(--srm-blue);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--srm-light);
+        }
+
+        .ad-container {
+            background: #f8f9fa;
+            border: 1px dashed #ccc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #6c757d;
+        }
+
+        .ad-container h3 {
+            margin-bottom: 15px;
+            color: var(--srm-dark);
+        }
+
+        .ad-placeholder {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(45deg, #e0e0e0, #f5f5f5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #999;
+        }
+
+        .horizontal-ad {
+            grid-column: 1 / -1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px 0;
+            color: var(--srm-dark);
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            
+            .result-container {
+                order: -1;
+                margin-bottom: 25px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .course-item {
+                flex-wrap: wrap;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> SRM GPA Calculator</h1>
+            <p class="subtitle">Calculate your Grade Point Average based on SRM University's grading system</p>
+        </header>
+        
+        <div class="ad-container horizontal-ad">
+            <h3>Advertisement Space</h3>
+            <p>Google AdSense Banner Ad (728x90)</p>
+            <div class="ad-placeholder">
+                <!-- Replace with your Google AdSense code -->
+                <!-- Example: 
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"
+                    crossorigin="anonymous"></script>
+                <ins class="adsbygoogle"
+                    style="display:inline-block;width:728px;height:90px"
+                    data-ad-client="ca-pub-YOUR_PUB_ID"
+                    data-ad-slot="YOUR_AD_SLOT"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+                -->
+                Ad Space for Google AdSense
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="calculator-container">
+                <div class="instructions">
+                    <h2><i class="fas fa-info-circle"></i> How to Use This Calculator</h2>
+                    <ol>
+                        <li><strong>Enter course details</strong> - Add each course with its credit value and grade</li>
+                        <li><strong>Add courses</strong> - Click "Add Course" for each course you need to include</li>
+                        <li><strong>Calculate</strong> - Click "Calculate GPA" to see your result</li>
+                        <li><strong>Reset</strong> - Start over anytime with the "Reset" button</li>
+                    </ol>
+                </div>
+                
+                <div class="input-section">
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="courseName">Course Name (Optional)</label>
+                            <input type="text" id="courseName" placeholder="e.g., Calculus, Physics">
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="courseCredits">Credits</label>
+                            <input type="number" id="courseCredits" min="1" max="10" value="4" placeholder="Enter credit value">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="courseGrade">Grade</label>
+                            <select id="courseGrade">
+                                <option value="10">O (Outstanding - 10)</option>
+                                <option value="9">A+ (Excellent - 9)</option>
+                                <option value="8">A (Very Good - 8)</option>
+                                <option value="7">B+ (Good - 7)</option>
+                                <option value="6">B (Above Average - 6)</option>
+                                <option value="5">C (Average - 5)</option>
+                                <option value="4">P (Pass - 4)</option>
+                                <option value="0">F (Fail - 0)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="addCourseBtn"><i class="fas fa-plus-circle"></i> Add Course</button>
+                        <button id="calculateBtn"><i class="fas fa-calculator"></i> Calculate GPA</button>
+                        <button id="resetBtn"><i class="fas fa-redo"></i> Reset</button>
+                    </div>
+                </div>
+                
+                <div class="course-list">
+                    <h3><i class="fas fa-list"></i> Your Courses</h3>
+                    <div id="coursesContainer">
+                        <!-- Courses will be added here dynamically -->
+                        <div class="empty-state">No courses added yet. Start by adding your first course.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-card">
+                    <h2>Your SRM GPA</h2>
+                    <div class="gpa-value">0.00</div>
+                    <div class="gpa-scale">on a 10-point scale</div>
+                </div>
+                
+                <div class="ad-container">
+                    <h3>Advertisement Space</h3>
+                    <p>Google AdSense Vertical Ad (300x600)</p>
+                    <div class="ad-placeholder">
+                        <!-- Replace with your Google AdSense code -->
+                        <!-- Example: 
+                        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUB_ID"
+                            crossorigin="anonymous"></script>
+                        <ins class="adsbygoogle"
+                            style="display:inline-block;width:300px;height:600px"
+                            data-ad-client="ca-pub-YOUR_PUB_ID"
+                            data-ad-slot="YOUR_AD_SLOT"></ins>
+                        <script>
+                            (adsbygoogle = window.adsbygoogle || []).push({});
+                        </script>
+                        -->
+                        Ad Space for Google AdSense
+                    </div>
+                </div>
+                
+                <div class="grade-info">
+                    <h3><i class="fas fa-graduation-cap"></i> SRM Grading System</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Grade</th>
+                                <th>Points</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>O</td>
+                                <td>10</td>
+                                <td>Outstanding</td>
+                            </tr>
+                            <tr>
+                                <td>A+</td>
+                                <td>9</td>
+                                <td>Excellent</td>
+                            </tr>
+                            <tr>
+                                <td>A</td>
+                                <td>8</td>
+                                <td>Very Good</td>
+                            </tr>
+                            <tr>
+                                <td>B+</td>
+                                <td>7</td>
+                                <td>Good</td>
+                            </tr>
+                            <tr>
+                                <td>B</td>
+                                <td>6</td>
+                                <td>Above Average</td>
+                            </tr>
+                            <tr>
+                                <td>C</td>
+                                <td>5</td>
+                                <td>Average</td>
+                            </tr>
+                            <tr>
+                                <td>P</td>
+                                <td>4</td>
+                                <td>Pass</td>
+                            </tr>
+                            <tr>
+                                <td>F</td>
+                                <td>0</td>
+                                <td>Fail</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ad-container horizontal-ad">
+            <h3>Advertisement Space</h3>
+            <p>Google AdSense Banner Ad (728x90)</p>
+            <div class="ad-placeholder">
+                <!-- Replace with your Google AdSense code -->
+                Ad Space for Google AdSense
+            </div>
+        </div>
+        
+        <footer>
+            <p>SRM GPA Calculator &copy; 2023 | For accurate results, refer to your official transcript</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const courseNameInput = document.getElementById('courseName');
+            const courseCreditsInput = document.getElementById('courseCredits');
+            const courseGradeSelect = document.getElementById('courseGrade');
+            const addCourseBtn = document.getElementById('addCourseBtn');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const coursesContainer = document.getElementById('coursesContainer');
+            const gpaValueElement = document.querySelector('.gpa-value');
+            
+            // Course data
+            let courses = [];
+            
+            // Add course to the list
+            addCourseBtn.addEventListener('click', function() {
+                const name = courseNameInput.value.trim() || 'Unnamed Course';
+                const credits = parseFloat(courseCreditsInput.value);
+                const grade = parseInt(courseGradeSelect.value);
+                
+                if (isNaN(credits) || credits <= 0) {
+                    alert('Please enter a valid credit value');
+                    return;
+                }
+                
+                // Add to courses array
+                courses.push({
+                    name: name,
+                    credits: credits,
+                    grade: grade
+                });
+                
+                // Add to UI
+                renderCourses();
+                
+                // Clear inputs
+                courseNameInput.value = '';
+                courseCreditsInput.value = '4';
+                courseGradeSelect.selectedIndex = 0;
+                
+                // Focus on course name for next entry
+                courseNameInput.focus();
+            });
+            
+            // Calculate GPA
+            calculateBtn.addEventListener('click', function() {
+                if (courses.length === 0) {
+                    alert('Please add at least one course');
+                    return;
+                }
+                
+                let totalCredits = 0;
+                let totalPoints = 0;
+                
+                courses.forEach(course => {
+                    totalCredits += course.credits;
+                    totalPoints += (course.credits * course.grade);
+                });
+                
+                const gpa = totalPoints / totalCredits;
+                
+                // Display result
+                gpaValueElement.textContent = gpa.toFixed(2);
+                
+                // Add animation for visual feedback
+                gpaValueElement.parentElement.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    gpaValueElement.parentElement.style.transform = 'scale(1)';
+                }, 300);
+            });
+            
+            // Reset everything
+            resetBtn.addEventListener('click', function() {
+                courses = [];
+                renderCourses();
+                gpaValueElement.textContent = '0.00';
+                courseNameInput.value = '';
+                courseCreditsInput.value = '4';
+                courseGradeSelect.selectedIndex = 0;
+            });
+            
+            // Render courses in the UI
+            function renderCourses() {
+                coursesContainer.innerHTML = '';
+                
+                if (courses.length === 0) {
+                    coursesContainer.innerHTML = '<div class="empty-state">No courses added yet. Start by adding your first course.</div>';
+                    return;
+                }
+                
+                courses.forEach((course, index) => {
+                    const courseElement = document.createElement('div');
+                    courseElement.className = 'course-item';
+                    courseElement.innerHTML = `
+                        <div style="flex: 2; font-weight: 600;">${course.name}</div>
+                        <div style="flex: 1;">Credits: ${course.credits}</div>
+                        <div style="flex: 1;">Grade: ${getGradeText(course.grade)}</div>
+                        <button class="remove-btn" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    coursesContainer.appendChild(courseElement);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        courses.splice(index, 1);
+                        renderCourses();
+                    });
+                });
+            }
+            
+            // Helper function to get grade text from value
+            function getGradeText(gradeValue) {
+                const gradeMap = {
+                    10: 'O',
+                    9: 'A+',
+                    8: 'A',
+                    7: 'B+',
+                    6: 'B',
+                    5: 'C',
+                    4: 'P',
+                    0: 'F'
+                };
+                return gradeMap[gradeValue] || gradeValue;
+            }
+            
+            // Initialize the app
+            renderCourses();
+        });
+    </script>
+</body>
+</html>
